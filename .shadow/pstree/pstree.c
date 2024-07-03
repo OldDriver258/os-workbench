@@ -5,6 +5,8 @@
 #include <dirent.h>
 #include <sys/types.h>
 
+#define PROC_ROOT   "/proc"
+
 int main(int argc, char *argv[]) {
     int opt, opt_index = 0;
     struct option pstree_option[] = {
@@ -38,17 +40,36 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    proc_dir = opendir("/proc");
+    proc_dir = opendir(PROC_ROOT);
     if (proc_dir == NULL) {
         perror("open proc dir");
         return 1;
     }
 
-    while ((procs_entry = readdir(proc_dir))) {
-        if (procs_entry->d_type == DT_DIR) {
-            int pid = atoi(procs_entry->d_name);
-            if (pid != 0) {
-                printf("find pid %d\n", pid);
+    while ((procs_entry = readdir(proc_dir)) &&
+            procs_entry->d_type == DT_DIR) {
+        int pid = atoi(procs_entry->d_name);
+        if (pid != 0) {
+            FILE *stat_fp;
+            char  stat_path[256];
+            int   ppid;
+
+            sprintf(stat_path, PROC_ROOT"/%d/stat", pid);
+            stat_fp = fopen(stat_path, "r");
+            if (!stat_fp) {
+                goto release;
+            }
+
+            if (fscanf(stat_fp, "%*d %*s %*s %d %*[^\n]", &ppid) != 1) {
+                perror("fscanf ppid error");
+                goto release;
+            }
+
+            printf("find pid %d\n", pid);
+
+release:
+            if (stat_fp) {
+                fclose(stat_fp);
             }
         }
     }
