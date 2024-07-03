@@ -46,30 +46,31 @@ int main(int argc, char *argv[]) {
         return 1;
     }
 
-    while ((procs_entry = readdir(proc_dir)) &&
-            procs_entry->d_type == DT_DIR) {
-        int pid = atoi(procs_entry->d_name);
-        if (pid != 0) {
-            FILE *stat_fp;
-            char  stat_path[256];
-            int   ppid;
+    while ((procs_entry = readdir(proc_dir))) {
+        if (procs_entry->d_type == DT_DIR) {
+            int pid = atoi(procs_entry->d_name);
+            if (pid != 0) {
+                FILE *stat_fp;
+                char  stat_path[256];
+                int   ppid;
 
-            sprintf(stat_path, PROC_ROOT"/%d/stat", pid);
-            stat_fp = fopen(stat_path, "r");
-            if (!stat_fp) {
-                goto release;
-            }
+                sprintf(stat_path, PROC_ROOT"/%d/stat", pid);
+                stat_fp = fopen(stat_path, "r");
+                if (!stat_fp) {
+                    goto release;
+                }
 
-            if (fscanf(stat_fp, "%*d %*s %*s %d %*[^\n]", &ppid) != 1) {
-                perror("fscanf ppid error");
-                goto release;
-            }
+                if (fscanf(stat_fp, "%*d %*s %*s %d %*[^\n]", &ppid) != 1) {
+                    perror("fscanf ppid error");
+                    goto release;
+                }
 
-            printf("find pid %d\n", pid);
+                printf("find pid %d\n", pid);
 
-release:
-            if (stat_fp) {
-                fclose(stat_fp);
+    release:
+                if (stat_fp) {
+                    fclose(stat_fp);
+                }
             }
         }
     }
