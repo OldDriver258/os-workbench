@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
 
     while ((procs_entry = readdir(proc_dir))) {
         if (procs_entry->d_type == DT_DIR) {
-            pid = atoi(procs_entry->d_name);
+            int pid = atoi(procs_entry->d_name);
             if (pid != 0) {
                 printf("find pid %d\n", pid);
             }
