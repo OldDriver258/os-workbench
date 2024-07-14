@@ -4,8 +4,30 @@
 #include <getopt.h>
 #include <dirent.h>
 #include <sys/types.h>
+#include <malloc.h>
+#include <string.h>
 
 #define PROC_ROOT   "/proc"
+#define PNODE_MAX   1000
+
+typedef struct PChild {
+    int            index;
+    struct PChild *next;
+} PChild;
+
+typedef struct PNode {
+    char          name[256];
+    int           pid;
+    PChild       *first_child;
+} PNode;
+
+PNode PNodes[PNODE_MAX];
+int   PNode_num = 0;
+
+int add_edge(char *name, int ppid, int pid) {
+    
+    
+} 
 
 int main(int argc, char *argv[]) {
     int opt, opt_index = 0;
@@ -52,6 +74,7 @@ int main(int argc, char *argv[]) {
             if (pid != 0) {
                 FILE *stat_fp;
                 char  stat_path[256];
+                char  pname[256];
                 int   ppid;
 
                 sprintf(stat_path, PROC_ROOT"/%d/stat", pid);
@@ -60,7 +83,7 @@ int main(int argc, char *argv[]) {
                     goto release;
                 }
 
-                if (fscanf(stat_fp, "%*d %*s %*s %d %*[^\n]", &ppid) != 1) {
+                if (fscanf(stat_fp, "%*d (%s) %*s %d %*[^\n]", pname, &ppid) != 1) {
                     perror("fscanf ppid error");
                     goto release;
                 }
