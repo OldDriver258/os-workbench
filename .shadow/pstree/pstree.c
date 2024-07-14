@@ -173,6 +173,7 @@ int main (int argc, char *argv[]) {
         }
     }
 
+    add_edge("test0", 0, 1);
     add_edge("test1", 1, 2);
     add_edge("test2", 2, 3);
     add_edge("test3", 2, 4);
