@@ -68,10 +68,10 @@ int add_edge (char *name, int ppid, int pid) {
     PNode_num++;
 
     //test
-    for (int i = 0; i < PNode_num; i++)
-    {
-        printf ("i:%d, name:%s, pid:%d\n", i, PNodes[i].name, PNodes[i].pid);
-    }
+    // for (int i = 0; i < PNode_num; i++)
+    // {
+    //     printf ("i:%d, name:%s, pid:%d\n", i, PNodes[i].name, PNodes[i].pid);
+    // }
     
 
     // if (i < PNode_num) {
@@ -88,12 +88,13 @@ int dfs_print (int index) {
     PNode *pnode = &PNodes[index];
 
     printf("%d\n", pnode->pid);
-    printf("+");
+    printf("(");
     for (PChild *pchild = pnode->first_child;
          pchild != NULL;
          pchild = pchild->next) {
         dfs_print(pchild->index);
     }
+    printf(")");
 
     return 0;
 }
