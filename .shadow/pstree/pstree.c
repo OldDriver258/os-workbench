@@ -67,6 +67,13 @@ int add_edge (char *name, int ppid, int pid) {
 
     PNode_num++;
 
+    //test
+    for (int i = 0; i < PNode_num; i++)
+    {
+        printf ("i:%d, name:%s, pid:%d\n", i, PNodes[i].name, PNodes[i].pid);
+    }
+    
+
     // if (i < PNode_num) {
     //     // 已经存在的节点
         
@@ -163,7 +170,7 @@ int main (int argc, char *argv[]) {
     }
 
     // dfs 打印输出
-
+    dfs_print(0);
 
     return 0;
 }
