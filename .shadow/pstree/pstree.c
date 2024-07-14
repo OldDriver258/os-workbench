@@ -115,7 +115,7 @@ int dfs_graph (char *dfs_seqence) {
     char  pid[16];
     int   level = 0;
 
-    while (p_start) {
+    while (*p_start) {
         if (isdigit(*p_end)) {
             while (isdigit(*p_end)) {
                 p_end++;
