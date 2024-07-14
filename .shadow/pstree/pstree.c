@@ -92,7 +92,7 @@ int dfs_print (int index) {
 
     if (pchild) {
         while (pchild != NULL) {
-            printf("+-", pnode->pid);
+            printf("+-");
             dfs_print(pchild->index);
             pchild = pchild->next;
             if (pchild) {
