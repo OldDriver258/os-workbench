@@ -24,10 +24,10 @@ typedef struct PNode {
 PNode PNodes[PNODE_MAX];
 int   PNode_num = 0;
 
-int add_edge(char *name, int ppid, int pid) {
+// int add_edge(char *name, int ppid, int pid) {
     
     
-} 
+// } 
 
 int main(int argc, char *argv[]) {
     int opt, opt_index = 0;
