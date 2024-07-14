@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
                     goto release;
                 }
 
-                printf("find pid %d, ppid %d\n", pid, ppid);
+                printf("find %s pid %d, ppid %d\n", pname, pid, ppid);
 
     release:
                 if (stat_fp) {
