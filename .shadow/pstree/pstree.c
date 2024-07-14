@@ -24,12 +24,72 @@ typedef struct PNode {
 PNode PNodes[PNODE_MAX];
 int   PNode_num = 0;
 
-// int add_edge(char *name, int ppid, int pid) {
-    
-    
-// } 
+int pnode_list_add_end (PNode* pnode, int index) {
+    PChild *child = pnode->first_child;
 
-int main(int argc, char *argv[]) {
+    while (child->next) {
+        child = child->next
+    }
+
+    child->next = (PChild*)malloc(sizeof(PChild));
+    child->next->index = index;
+    child->next->next  = NULL;
+
+    return 0;
+}
+
+int add_edge (char *name, int ppid, int pid) {
+    // int index;
+
+    // for (index = 0; index < PNode_num; index++) {
+    //     if (PNodes[index].pid == pid) {
+    //         break;
+    //     }
+    // }
+
+    // if (index < PNode_num) {
+    //     // 已经存在的节点
+    // } else {
+    //     // 新的节点
+    //     strcpy(PNodes[index].name, name);
+    //     PNodes[index].pid = pid;
+    //     PNode_num++;
+    // }
+
+    strcpy(PNodes[PNode_num].name, name);
+    PNodes[PNode_num].pid = pid;
+
+    for (int i = 0; i < PNode_num; i++) {
+        if (PNodes[i].ppid == pid) {
+            pnode_list_add_end(&PNodes[i], PNode_num);
+        }
+    }
+
+    PNode_num++;
+
+    // if (i < PNode_num) {
+    //     // 已经存在的节点
+        
+    // } else {
+    //     // 新的节点
+    // }
+
+    return 0;
+}
+
+int dfs_print (index) {
+    PNode *pnode = &PNodes[index];
+
+    printf("%d\n", pnode->pid)
+    printf("+");
+    for (PChild *pchild = pnode->first_child;
+         pchild != NULL;
+         pchild = pchild->next) {
+        dfs_print(pchild->index);
+    }
+}
+
+int main (int argc, char *argv[]) {
     int opt, opt_index = 0;
     struct option pstree_option[] = {
         {"show-pids", no_argument, NULL, 'p'},
@@ -88,7 +148,9 @@ int main(int argc, char *argv[]) {
                     goto release;
                 }
 
+                // 添加有向边
                 printf("find %s pid %d, ppid %d\n", pname, pid, ppid);
+                add_edge(pname, ppid, pid);
 
     release:
                 if (stat_fp) {
@@ -97,6 +159,8 @@ int main(int argc, char *argv[]) {
             }
         }
     }
+
+    // dfs 打印输出
 
 
     return 0;
