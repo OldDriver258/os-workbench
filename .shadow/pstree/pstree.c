@@ -109,11 +109,12 @@ int dfs_print (int index) {
     return 0;
 }
 
-int dfs_graph (char *dfs_seqence) {
-    char *p_start = dfs_seqence;
-    char *p_end = dfs_seqence;
-    char  pid[16];
-    int   level = 0;
+int dfs_graph(char *dfs_sequence) {
+    char *p_start = dfs_sequence;
+    char *p_end = dfs_sequence;
+    char pid[16];
+    int level = 0;
+    int branch[MAX_LEVEL] = {0};  // 用于记录每一层是否有子节点
 
     while (*p_start) {
         if (isdigit(*p_end)) {
@@ -127,6 +128,8 @@ int dfs_graph (char *dfs_seqence) {
             for (int i = 0; i < level; i++) {
                 if (i == level - 1) {
                     printf("+-");
+                } else if (branch[i]) {
+                    printf("| ");
                 } else {
                     printf("  ");
                 }
@@ -135,17 +138,21 @@ int dfs_graph (char *dfs_seqence) {
             printf("%s\n", pid);
         }
 
-        switch (*p_end)         
-        {
+        switch (*p_end) {
         case '(':
+            branch[level] = 1;  // 当前层有子节点
             level++;
             break;
 
         case ')':
+            branch[level] = 0;  // 当前层没有子节点
             level--;
             break;
-        
+
         case ',':
+            branch[level - 1] = 1;  // 父节点有多个子节点
+            break;
+
         default:
             break;
         }
