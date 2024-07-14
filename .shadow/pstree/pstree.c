@@ -163,7 +163,7 @@ int main (int argc, char *argv[]) {
 
                 // 添加有向边
                 printf("find %s pid %d, ppid %d\n", pname, pid, ppid);
-                add_edge(pname, ppid, pid);
+                // add_edge(pname, ppid, pid);
 
     release:
                 if (stat_fp) {
@@ -173,6 +173,12 @@ int main (int argc, char *argv[]) {
         }
     }
 
+    add_edge("test1", 1, 2);
+    add_edge("test2", 2, 3);
+    add_edge("test3", 2, 4);
+    add_edge("test4", 3, 5);
+    add_edge("test5", 4, 6);
+    add_edge("test6", 3, 7);
     // dfs 打印输出
     dfs_print(0);
 
