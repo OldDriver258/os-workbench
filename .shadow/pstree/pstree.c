@@ -6,6 +6,7 @@
 #include <sys/types.h>
 #include <malloc.h>
 #include <string.h>
+#include <ctype.h>
 
 #define PROC_ROOT   "/proc"
 #define PNODE_MAX   1000
@@ -108,6 +109,46 @@ int dfs_print (int index) {
     return 0;
 }
 
+int dfs_graph (char *dfs_seqence) {
+    char *p_start = dfs_seqence;
+    char *p_end = dfs_seqence;
+    char  pid[16];
+    int   level = 0;
+
+    while (p_start) {
+        while (isdigit(*p_end)) {
+            p_end++;
+        }
+
+        strncpy(pid, p_start, p_end - p_start);
+
+        for (int i = 0; i < level; i++) {
+            printf("  ");
+        }
+
+        printf("%s\n", pid);
+
+        p_start = ++p_end;
+        switch (*p_end)         
+        {
+        case '(':
+            level++;
+            break;
+
+        case ')':
+            level--;
+            break;
+        
+        case ','
+        default:
+            break;
+        }
+        level++;
+    }
+
+
+}
+
 int main (int argc, char *argv[]) {
     int opt, opt_index = 0;
     struct option pstree_option[] = {
@@ -191,6 +232,7 @@ int main (int argc, char *argv[]) {
     
     dfs_print(0);
     printf("%s\n", dfs_seqence);
+    dfs_graph(dfs_seqence);
 
     return 0;
 }
