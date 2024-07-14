@@ -28,7 +28,7 @@ int pnode_list_add_end (PNode* pnode, int index) {
     PChild *child = pnode->first_child;
 
     while (child->next) {
-        child = child->next
+        child = child->next;
     }
 
     child->next = (PChild*)malloc(sizeof(PChild));
@@ -77,7 +77,7 @@ int add_edge (char *name, int ppid, int pid) {
     return 0;
 }
 
-int dfs_print (index) {
+int dfs_print (int index) {
     PNode *pnode = &PNodes[index];
 
     printf("%d\n", pnode->pid);
