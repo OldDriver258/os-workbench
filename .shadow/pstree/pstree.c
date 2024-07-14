@@ -116,19 +116,20 @@ int dfs_graph (char *dfs_seqence) {
     int   level = 0;
 
     while (p_start) {
-        while (isdigit(*p_end)) {
-            p_end++;
+        if (isdigit(*p_end)) {
+            while (isdigit(*p_end)) {
+                p_end++;
+            }
+
+            strncpy(pid, p_start, p_end - p_start);
+
+            for (int i = 0; i < level; i++) {
+                printf("  ");
+            }
+
+            printf("%s\n", pid);
         }
 
-        strncpy(pid, p_start, p_end - p_start);
-
-        for (int i = 0; i < level; i++) {
-            printf("  ");
-        }
-
-        printf("%s\n", pid);
-
-        p_start = ++p_end;
         switch (*p_end)         
         {
         case '(':
@@ -143,7 +144,8 @@ int dfs_graph (char *dfs_seqence) {
         default:
             break;
         }
-        level++;
+
+        p_start = ++p_end;
     }
 
     return 0;
