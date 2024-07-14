@@ -88,7 +88,7 @@ int dfs_print (int index) {
     PNode *pnode = &PNodes[index];
     PChild *pchild = pnode->first_child;
 
-    
+    printf("%d", pnode->pid);
 
     if (pchild) {
         while (pchild != NULL) {
@@ -96,11 +96,12 @@ int dfs_print (int index) {
             dfs_print(pchild->index);
             pchild = pchild->next;
             if (pchild) {
+                printf("\n");
             }
         }
     }
 
-    printf("%d\n", pnode->pid);
+    
 
     return 0;
 }
