@@ -10,6 +10,7 @@
 
 #define PROC_ROOT   "/proc"
 #define PNODE_MAX   1000
+#define MAX_LEVEL   100
 
 typedef struct PChild {
     int            index;
