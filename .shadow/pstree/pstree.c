@@ -27,7 +27,7 @@ int   PNode_num = 0;
 int pnode_list_add_end (PNode* pnode, int index) {
     PChild *child = pnode->first_child;
 
-    while (child->next) {
+    while (child) {
         child = child->next;
     }
 
