@@ -95,6 +95,9 @@ int dfs_print (int index) {
         while (pchild != NULL) {
             dfs_print(pchild->index);
             pchild = pchild->next;
+            if (pchild) {
+                 printf(",");
+            }
         }
         printf(")");
     }
