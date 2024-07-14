@@ -179,6 +179,7 @@ int main (int argc, char *argv[]) {
     add_edge("test4", 3, 5);
     add_edge("test5", 4, 6);
     add_edge("test6", 3, 7);
+    add_edge("test6", 1, 8);
     // dfs 打印输出
     dfs_print(0);
 
