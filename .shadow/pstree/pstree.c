@@ -139,7 +139,7 @@ int dfs_graph (char *dfs_seqence) {
             level--;
             break;
         
-        case ','
+        case ',':
         default:
             break;
         }
