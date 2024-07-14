@@ -121,6 +121,7 @@ int dfs_graph (char *dfs_seqence) {
                 p_end++;
             }
 
+            memset(pid, 0, sizeof(pid));
             strncpy(pid, p_start, p_end - p_start);
 
             for (int i = 0; i < level; i++) {
