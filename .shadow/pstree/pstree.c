@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
                     goto release;
                 }
 
-                if (fscanf(stat_fp, "%*d %s %*s %d %*[^\n]", pname, &ppid) != 1) {
+                if (fscanf(stat_fp, "%*d %s %*s %d %*[^\n]", pname, &ppid) != 2) {
                     perror("fscanf ppid error");
                     goto release;
                 }
