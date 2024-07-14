@@ -146,7 +146,7 @@ int dfs_graph (char *dfs_seqence) {
         level++;
     }
 
-
+    return 0;
 }
 
 int main (int argc, char *argv[]) {
