@@ -86,15 +86,18 @@ int add_edge (char *name, int ppid, int pid) {
 
 int dfs_print (int index) {
     PNode *pnode = &PNodes[index];
+    PChild *pchild = pnode->first_child;
 
     printf("%d", pnode->pid);
-    printf("(");
-    for (PChild *pchild = pnode->first_child;
-         pchild != NULL;
-         pchild = pchild->next) {
-        dfs_print(pchild->index);
+
+    if (pchild) {
+        printf("(");
+        while (pchild != NULL) {
+            dfs_print(pchild->index);
+            pchild = pchild->next;
+        }
+        printf(")");
     }
-    printf(")");
 
     return 0;
 }
