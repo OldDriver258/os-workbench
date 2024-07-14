@@ -23,6 +23,7 @@ typedef struct PNode {
 
 PNode PNodes[PNODE_MAX];
 int   PNode_num = 0;
+char  dfs_seqence[1024];
 
 int pnode_list_add_end (PNode* pnode, int index) {
     PChild **child = &pnode->first_child;
@@ -88,20 +89,19 @@ int dfs_print (int index) {
     PNode *pnode = &PNodes[index];
     PChild *pchild = pnode->first_child;
 
-    printf("%d", pnode->pid);
+    strcat(dfs_seqence, itoa(pnode->pid));
 
     if (pchild) {
+        strcat(dfs_seqence, "(");
         while (pchild != NULL) {
-            printf("\n+-");
             dfs_print(pchild->index);
             pchild = pchild->next;
             if (pchild) {
-                // printf("\n");
+                 strcat(dfs_seqence, ",");
             }
         }
+        strcat(dfs_seqence, ")");
     }
-
-    
 
     return 0;
 }
@@ -186,7 +186,9 @@ int main (int argc, char *argv[]) {
     add_edge("test6", 3, 7);
     add_edge("test6", 1, 8);
     // dfs 打印输出
+    
     dfs_print(0);
+    printf("%s\n", dfs_seqence);
 
     return 0;
 }
