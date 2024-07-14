@@ -10,7 +10,6 @@
 
 #define PROC_ROOT   "/proc"
 #define PNODE_MAX   1000
-#define MAX_LEVEL   100
 
 typedef struct PChild {
     int            index;
@@ -110,12 +109,11 @@ int dfs_print (int index) {
     return 0;
 }
 
-int dfs_graph(char *dfs_sequence) {
-    char *p_start = dfs_sequence;
-    char *p_end = dfs_sequence;
-    char pid[16];
-    int level = 0;
-    int branch[MAX_LEVEL] = {0};  // 用于记录每一层是否有子节点
+int dfs_graph (char *dfs_seqence) {
+    char *p_start = dfs_seqence;
+    char *p_end = dfs_seqence;
+    char  pid[16];
+    int   level = 0;
 
     while (*p_start) {
         if (isdigit(*p_end)) {
@@ -129,8 +127,6 @@ int dfs_graph(char *dfs_sequence) {
             for (int i = 0; i < level; i++) {
                 if (i == level - 1) {
                     printf("+-");
-                } else if (branch[i]) {
-                    printf("| ");
                 } else {
                     printf("  ");
                 }
@@ -139,21 +135,17 @@ int dfs_graph(char *dfs_sequence) {
             printf("%s\n", pid);
         }
 
-        switch (*p_end) {
+        switch (*p_end)         
+        {
         case '(':
-            branch[level] = 1;  // 当前层有子节点
             level++;
             break;
 
         case ')':
-            branch[level] = 0;  // 当前层没有子节点
             level--;
             break;
-
+        
         case ',':
-            branch[level - 1] = 1;  // 父节点有多个子节点
-            break;
-
         default:
             break;
         }
@@ -225,7 +217,7 @@ int main (int argc, char *argv[]) {
 
                 // 添加有向边
                 printf("find %s pid %d, ppid %d\n", pname, pid, ppid);
-                // add_edge(pname, ppid, pid);
+                add_edge(pname, ppid, pid);
 
     release:
                 if (stat_fp) {
@@ -235,18 +227,18 @@ int main (int argc, char *argv[]) {
         }
     }
 
-    add_edge("test0", 0, 1);
-    add_edge("test1", 1, 2);
-    add_edge("test2", 2, 3);
-    add_edge("test3", 2, 4);
-    add_edge("test4", 3, 5);
-    add_edge("test5", 4, 6);
-    add_edge("test6", 3, 7);
-    add_edge("test6", 1, 8);
+    // add_edge("test0", 0, 1);
+    // add_edge("test1", 1, 2);
+    // add_edge("test2", 2, 3);
+    // add_edge("test3", 2, 4);
+    // add_edge("test4", 3, 5);
+    // add_edge("test5", 4, 6);
+    // add_edge("test6", 3, 7);
+    // add_edge("test6", 1, 8);
     // dfs 打印输出
     
     dfs_print(0);
-    printf("%s\n", dfs_seqence);
+    // printf("%s\n", dfs_seqence);
     dfs_graph(dfs_seqence);
 
     return 0;
