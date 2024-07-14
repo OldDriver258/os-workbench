@@ -1,245 +1,108 @@
 #include <stdio.h>
-#include <assert.h>
 #include <stdlib.h>
-#include <getopt.h>
-#include <dirent.h>
-#include <sys/types.h>
-#include <malloc.h>
-#include <string.h>
-#include <ctype.h>
 
-#define PROC_ROOT   "/proc"
-#define PNODE_MAX   1000
+typedef struct TreeNode {
+    int value;
+    struct TreeNode **children;
+    int child_count;
+} TreeNode;
 
-typedef struct PChild {
-    int            index;
-    struct PChild *next;
-} PChild;
-
-typedef struct PNode {
-    char          name[256];
-    int           pid;
-    PChild       *first_child;
-} PNode;
-
-PNode PNodes[PNODE_MAX];
-int   PNode_num = 0;
-char  dfs_seqence[1024];
-
-int pnode_list_add_end (PNode* pnode, int index) {
-    PChild **child = &pnode->first_child;
-
-    while (*child) {
-        child = &(*child)->next;
-    }
-
-    *child = (PChild*)malloc(sizeof(PChild));
-    (*child)->index = index;
-    (*child)->next  = NULL;
-
-    return 0;
+TreeNode* create_node(int value) {
+    TreeNode *node = (TreeNode *)malloc(sizeof(TreeNode));
+    node->value = value;
+    node->children = NULL;
+    node->child_count = 0;
+    return node;
 }
 
-int add_edge (char *name, int ppid, int pid) {
-    // int index;
+void add_child(TreeNode *parent, TreeNode *child) {
+    parent->child_count++;
+    parent->children = (TreeNode **)realloc(parent->children, parent->child_count * sizeof(TreeNode *));
+    parent->children[parent->child_count - 1] = child;
+}
 
-    // for (index = 0; index < PNode_num; index++) {
-    //     if (PNodes[index].pid == pid) {
-    //         break;
-    //     }
-    // }
+TreeNode* build_tree(int edges[][2], int edge_count) {
+    TreeNode **nodes = (TreeNode **)malloc(100 * sizeof(TreeNode *));
+    for (int i = 0; i < 100; i++) {
+        nodes[i] = NULL;
+    }
 
-    // if (index < PNode_num) {
-    //     // 已经存在的节点
-    // } else {
-    //     // 新的节点
-    //     strcpy(PNodes[index].name, name);
-    //     PNodes[index].pid = pid;
-    //     PNode_num++;
-    // }
+    for (int i = 0; i < edge_count; i++) {
+        int parent_value = edges[i][0];
+        int child_value = edges[i][1];
 
-    strcpy(PNodes[PNode_num].name, name);
-    PNodes[PNode_num].pid = pid;
-
-    for (int i = 0; i < PNode_num; i++) {
-        if (PNodes[i].pid == ppid) {
-            pnode_list_add_end(&PNodes[i], PNode_num);
+        if (nodes[parent_value] == NULL) {
+            nodes[parent_value] = create_node(parent_value);
         }
+        if (nodes[child_value] == NULL) {
+            nodes[child_value] = create_node(child_value);
+        }
+        add_child(nodes[parent_value], nodes[child_value]);
     }
 
-    PNode_num++;
-
-    //test
-    // for (int i = 0; i < PNode_num; i++)
-    // {
-    //     printf ("i:%d, name:%s, pid:%d\n", i, PNodes[i].name, PNodes[i].pid);
-    // }
-    
-
-    // if (i < PNode_num) {
-    //     // 已经存在的节点
-        
-    // } else {
-    //     // 新的节点
-    // }
-
-    return 0;
+    TreeNode *root = nodes[edges[0][0]];
+    free(nodes);
+    return root;
 }
 
-int dfs_print (int index) {
-    PNode  *pnode = &PNodes[index];
-    PChild *pchild = pnode->first_child;
-    char    pid_str[16] = {0};
+void generate_bracket_sequence(TreeNode *node, char *output) {
+    char buffer[20];
+    sprintf(buffer, "%d", node->value);
+    strcat(output, buffer);
 
-    sprintf(pid_str, "%d", pnode->pid);
-    strcat(dfs_seqence, pid_str);
-
-    if (pchild) {
-        strcat(dfs_seqence, "(");
-        while (pchild != NULL) {
-            dfs_print(pchild->index);
-            pchild = pchild->next;
-            if (pchild) {
-                 strcat(dfs_seqence, ",");
+    if (node->child_count > 0) {
+        strcat(output, "(");
+        for (int i = 0; i < node->child_count; i++) {
+            generate_bracket_sequence(node->children[i], output);
+            if (i < node->child_count - 1) {
+                strcat(output, ",");
             }
         }
-        strcat(dfs_seqence, ")");
+        strcat(output, ")");
     }
-
-    return 0;
 }
 
-int dfs_graph (char *dfs_seqence) {
-    char *p_start = dfs_seqence;
-    char *p_end = dfs_seqence;
-    char  pid[16];
-    int   level = 0;
-
-    while (*p_start) {
-        if (isdigit(*p_end)) {
-            while (isdigit(*p_end)) {
-                p_end++;
-            }
-
-            memset(pid, 0, sizeof(pid));
-            strncpy(pid, p_start, p_end - p_start);
-
-            for (int i = 0; i < level; i++) {
-                if (i == level - 1) {
-                    printf("+-");
-                } else {
-                    printf("  ");
-                }
-            }
-
-            printf("%s\n", pid);
+void generate_tree_representation(TreeNode *node, int depth, int is_last, char *prefix) {
+    char buffer[100];
+    if (depth == 0) {
+        sprintf(buffer, "%d\n", node->value);
+    } else {
+        char connector[3] = "+-";
+        if (!is_last) {
+            sprintf(buffer, "%s|%s%d\n", prefix, connector, node->value);
+        } else {
+            sprintf(buffer, "%s+-%d\n", prefix, node->value);
         }
-
-        switch (*p_end)         
-        {
-        case '(':
-            level++;
-            break;
-
-        case ')':
-            level--;
-            break;
-        
-        case ',':
-        default:
-            break;
-        }
-
-        p_start = ++p_end;
     }
+    printf("%s", buffer);
 
-    return 0;
+    char new_prefix[100];
+    sprintf(new_prefix, "%s  ", prefix);
+    for (int i = 0; i < node->child_count; i++) {
+        generate_tree_representation(node->children[i], depth + 1, (i == node->child_count - 1), new_prefix);
+    }
 }
 
-int main (int argc, char *argv[]) {
-    int opt, opt_index = 0;
-    struct option pstree_option[] = {
-        {"show-pids", no_argument, NULL, 'p'},
-        {"numeric-sort", no_argument, NULL, 'n'},
-        {"version", no_argument, NULL, 'V'},
-        {0, 0, 0, 0}
+int main() {
+    int edges[][2] = {
+        {1, 2},
+        {2, 3},
+        {2, 4},
+        {3, 5},
+        {4, 6},
+        {3, 7},
+        {1, 8}
     };
-    DIR *proc_dir;
-    struct dirent *procs_entry;
+    int edge_count = sizeof(edges) / sizeof(edges[0]);
 
-    while ((opt = getopt_long(argc, argv, "pnV", pstree_option, &opt_index)) != -1) {
-        switch (opt)
-        {
-        case 'p':
-            printf("find p flag\n");
-            break;
-        
-        case 'n':
-            printf("find n flag\n");
-            break;
+    TreeNode *root = build_tree(edges, edge_count);
 
-        case 'V':
-            fprintf(stderr, "pstree 0.1\n");
-            return 0;
+    char bracket_sequence[1000] = "";
+    generate_bracket_sequence(root, bracket_sequence);
+    printf("括号序列表示:\n%s\n", bracket_sequence);
 
-        default:
-            fprintf(stderr, "Usage: pstree [-p --show-pids] [-n --numeric-sort]\n");
-            fprintf(stderr, "       pstree -V --version\n");
-            return 1;
-        }
-    }
-
-    proc_dir = opendir(PROC_ROOT);
-    if (proc_dir == NULL) {
-        perror("open proc dir");
-        return 1;
-    }
-
-    while ((procs_entry = readdir(proc_dir))) {
-        if (procs_entry->d_type == DT_DIR) {
-            int pid = atoi(procs_entry->d_name);
-            if (pid != 0) {
-                FILE *stat_fp;
-                char  stat_path[256];
-                char  pname[256];
-                int   ppid;
-
-                sprintf(stat_path, PROC_ROOT"/%d/stat", pid);
-                stat_fp = fopen(stat_path, "r");
-                if (!stat_fp) {
-                    goto release;
-                }
-
-                if (fscanf(stat_fp, "%*d %s %*s %d %*[^\n]", pname, &ppid) != 2) {
-                    perror("fscanf ppid error");
-                    goto release;
-                }
-
-                // 添加有向边
-                printf("find %s pid %d, ppid %d\n", pname, pid, ppid);
-                add_edge(pname, ppid, pid);
-
-    release:
-                if (stat_fp) {
-                    fclose(stat_fp);
-                }
-            }
-        }
-    }
-
-    // add_edge("test0", 0, 1);
-    // add_edge("test1", 1, 2);
-    // add_edge("test2", 2, 3);
-    // add_edge("test3", 2, 4);
-    // add_edge("test4", 3, 5);
-    // add_edge("test5", 4, 6);
-    // add_edge("test6", 3, 7);
-    // add_edge("test6", 1, 8);
-    // dfs 打印输出
-    
-    dfs_print(0);
-    // printf("%s\n", dfs_seqence);
-    dfs_graph(dfs_seqence);
+    printf("\n树的图形化表示:\n");
+    generate_tree_representation(root, 0, 1, "");
 
     return 0;
 }
