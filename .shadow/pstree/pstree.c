@@ -87,6 +87,8 @@ int dfs_print (index) {
          pchild = pchild->next) {
         dfs_print(pchild->index);
     }
+
+    return 0;
 }
 
 int main (int argc, char *argv[]) {
