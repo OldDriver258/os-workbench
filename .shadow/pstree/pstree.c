@@ -25,15 +25,15 @@ PNode PNodes[PNODE_MAX];
 int   PNode_num = 0;
 
 int pnode_list_add_end (PNode* pnode, int index) {
-    PChild *child = pnode->first_child;
+    PChild **child = &pnode->first_child;
 
-    while (child) {
-        child = child->next;
+    while (*child) {
+        child = &(*child)->next;
     }
 
-    child = (PChild*)malloc(sizeof(PChild));
-    child->index = index;
-    child->next  = NULL;
+    *child = (PChild*)malloc(sizeof(PChild));
+    *child->index = index;
+    *child->next  = NULL;
 
     return 0;
 }
