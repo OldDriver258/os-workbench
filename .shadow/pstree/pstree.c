@@ -125,7 +125,11 @@ int dfs_graph (char *dfs_seqence) {
             strncpy(pid, p_start, p_end - p_start);
 
             for (int i = 0; i < level; i++) {
-                printf("  ");
+                if (i == level - 1) {
+                    printf("+-");
+                } else {
+                    printf("  ");
+                }
             }
 
             printf("%s\n", pid);
