@@ -32,8 +32,8 @@ int pnode_list_add_end (PNode* pnode, int index) {
     }
 
     *child = (PChild*)malloc(sizeof(PChild));
-    *child->index = index;
-    *child->next  = NULL;
+    (*child)->index = index;
+    (*child)->next  = NULL;
 
     return 0;
 }
