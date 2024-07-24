@@ -239,7 +239,7 @@ void co_yield() {
         next_num = rand() % co_list_num + 1;
 
         list_for_each_entry(co_pos, co_list_head, co_list) {
-            if (--next_num) {
+            if (!(--next_num)) {
                 break;
             }
         }
