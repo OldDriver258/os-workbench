@@ -201,6 +201,14 @@ __attribute__((constructor)) void co_init (void)  {
     co_current = co_main;
 }
 
+void co_warpper (struct co *co) {
+    co->func(co->arg);
+    co->status = CO_DEAD;
+    while (1) {
+        co_yield();
+    }
+}
+
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
     struct co *new = (struct co *)malloc(sizeof(struct co));
 
@@ -250,7 +258,7 @@ void co_yield() {
 
         if (co_pos->status == CO_NEW) {
             co_pos->status = CO_RUNNING;
-            stack_switch_call(co_pos->stack + STACK_SIZE, co_pos->func, (uintptr_t)co_pos->arg);
+            stack_switch_call(co_pos->stack + STACK_SIZE, co_warpper, (uintptr_t)co_pos);
         }
         longjmp(co_pos->context, 1);
     } else {
