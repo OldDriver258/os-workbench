@@ -1,8 +1,11 @@
 #include "co.h"
 #include <stdlib.h>
+#include <stdint.h>
 #include <setjmp.h>
 #include <malloc.h>
 #include <time.h>
+
+#define STACK_SIZE  (8 * 1024)
 
 struct list_head {
 	struct list_head *next, *prev;
@@ -28,8 +31,8 @@ typedef enum co_status {
 //     uint64_t    rax, rbx, rcx, rdx;     // 通用寄存器
 //     uint64_t    rsi, rdi;               // 字符串操作寄存器
 //     uint64_t    rbp, rsp;               // 栈指针寄存器
-//     uint64_t    r8, r9, r10, r11, \
-//                 r12, r13, r14, r15      // 扩展通用寄存器
+//     uint64_t    r8, r9, r10, r11, 
+//     uint64_t    r12, r13, r14, r15      // 扩展通用寄存器
 //     uint64_t    rip;                    // PC 指针
 //     uint64_t    rflags;                 // 状态寄存器
 //     uint64_t    cr3;
