@@ -187,8 +187,6 @@ static inline void list_del(struct list_head *entry)
 __attribute__((constructor)) void co_init (void)  {
     struct co *co_main = (struct co *)malloc(sizeof(struct co));
 
-    co_main->next   = NULL;
-
     co_main->name   = "main";
     co_main->func   = NULL;       // main
     co_main->arg    = NULL;
@@ -221,7 +219,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 }
 
 void co_wait(struct co *co) {
-    while (co->co_status != CO_DEAD) {   
+    while (co->status != CO_DEAD) {   
         co_yield();
     }
 }
