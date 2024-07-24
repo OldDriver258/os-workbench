@@ -194,8 +194,9 @@ __attribute__((constructor)) void co_init (void)  {
     co_main->status = CO_RUNNING;
     co_main->wait   = NULL;
 
+    co_list_head    = &co_main->co_list
+    INIT_LIST_HEAD(co_list_head);
     co_list_num++;
-    INIT_LIST_HEAD(&co_main->co_list);
 
     co_current = co_main;
 }
