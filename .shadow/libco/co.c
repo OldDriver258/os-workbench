@@ -231,7 +231,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
     list_add(&new->co_list, co_list_head);
     co_list_num++;
 
-    debug("[co_list_num]: %p\n", co_list_num, new);
+    debug("[%d]: %p\n", co_list_num, new);
 
     co_yield();
 
