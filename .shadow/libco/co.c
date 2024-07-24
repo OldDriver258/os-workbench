@@ -5,7 +5,7 @@
 #include <malloc.h>
 #include <time.h>
 
-#define LOCAL_MACHINE
+#undef LOCAL_MACHINE
 #ifdef LOCAL_MACHINE
     #define debug(...) printf(__VA_ARGS__)
 #else
