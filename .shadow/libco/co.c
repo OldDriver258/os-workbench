@@ -247,7 +247,7 @@ void co_yield() {
         co_current = co_pos;
 
         if (co_pos->status == CO_NEW) {
-            stack_switch_call(co_pos->stack, co_pos->func, (uintptr_t)co_pos->arg);
+            stack_switch_call(co_pos->stack + STACK_SIZE, co_pos->func, (uintptr_t)co_pos->arg);
         }
         longjmp(co_pos->context, 1);
     } else {
