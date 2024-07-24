@@ -208,7 +208,8 @@ __attribute__((constructor)) void co_init (void)  {
     co_current = co_main;
 }
 
-// __attribute__((force_align_arg_pointer)) 
+// 这里的对齐很关键, 这里的对齐会将协程的 rsp 栈顶指针进行对齐, 对齐之后后续执行才不会出错误
+__attribute__((force_align_arg_pointer))
 void co_warpper (struct co *co) {
     co->func(co->arg);
     co->status = CO_DEAD;
