@@ -208,7 +208,8 @@ __attribute__((constructor)) void co_init (void)  {
     co_current = co_main;
 }
 
-__attribute__((force_align_arg_pointer)) void co_warpper (struct co *co) {
+// __attribute__((force_align_arg_pointer)) 
+void co_warpper (struct co *co) {
     co->func(co->arg);
     co->status = CO_DEAD;
     while (1) {
