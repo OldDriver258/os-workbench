@@ -266,6 +266,7 @@ void co_yield() {
         }
 
         co_current = co_pos;
+        debug("co_current = %s\n", co_current->name);
 
         if (co_pos->status == CO_NEW) {
             co_pos->status = CO_RUNNING;
