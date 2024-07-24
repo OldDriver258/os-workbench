@@ -191,7 +191,8 @@ static inline void list_del(struct list_head *entry)
 	     &pos->member != (head); 					\
 	     pos = n, n = list_entry(n->member.next, typeof(*n), member))
 
-__attribute__((constructor)) void co_init (void)  {
+__attribute__((constructor)) 
+void co_init (void)  {
     struct co *co_main = (struct co *)malloc(sizeof(struct co));
 
     co_main->name   = "main";
@@ -206,6 +207,8 @@ __attribute__((constructor)) void co_init (void)  {
     co_list_num++;
 
     co_current = co_main;
+
+    srand(time(NULL));
 }
 
 // 这里的对齐很关键, 这里的对齐会将协程的 rsp 栈顶指针进行对齐, 对齐之后后续执行才不会出错误
@@ -256,8 +259,9 @@ void co_yield() {
 
     if (val == 0) {
         // 选择下一个待运行的协程 (相当于修改 current), 并切换到这个协程运行
-        srand(time(NULL));
         next_num = (rand() % co_list_num) + 1;
+
+        debug("next_num = %d\n", next_num);
 
         list_for_each_entry(co_pos, co_list_head, co_list) {
             if (!(--next_num)) {
