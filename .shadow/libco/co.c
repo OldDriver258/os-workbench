@@ -211,6 +211,8 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
     new->status = CO_NEW;
     new->wait   = NULL;
 
+    printf("0x%x - 0x%x\n", new->stack, new->stack + STACK_SIZE);
+
     list_add(&new->co_list, co_list_head);
     co_list_num++;
 
