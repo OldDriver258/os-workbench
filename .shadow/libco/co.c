@@ -5,7 +5,7 @@
 #include <malloc.h>
 #include <time.h>
 
-#define STACK_SIZE  (8 * 1024)
+#define STACK_SIZE  (64 * 1024)
 
 struct list_head {
 	struct list_head *next, *prev;
