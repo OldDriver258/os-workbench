@@ -58,7 +58,7 @@ struct co {
     struct co       *wait;              // 哪条协程在等待本协程
     co_context_t    context;            // 上下文
     uint8_t         stack[STACK_SIZE];  // 协程的堆栈
-} __attribute__((aligned(16)));
+};
 
 struct co         *co_current;
 struct list_head  *co_list_head = NULL;
