@@ -184,7 +184,7 @@ static inline void list_del(struct list_head *entry)
 	     &pos->member != (head); 					\
 	     pos = n, n = list_entry(n->member.next, typeof(*n), member))
 
-void co_init (void) __attribute__((constructor)) {
+__attribute__((constructor)) void co_init (void)  {
     struct co *co_main = (struct co *)malloc(sizeof(struct co));
 
     co_main->next   = NULL;
@@ -221,9 +221,7 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 }
 
 void co_wait(struct co *co) {
-
-    while (co_status != CO_DEAD)
-    {   
+    while (co->co_status != CO_DEAD) {   
         co_yield();
     }
 }
@@ -239,7 +237,7 @@ void co_yield() {
     if (val == 0) {
         // 选择下一个待运行的协程 (相当于修改 current), 并切换到这个协程运行
         srand(time(NULL));
-        next_num = random_number = rand() % co_list_num + 1;
+        next_num = rand() % co_list_num + 1;
 
         list_for_each_entry(co_pos, co_list_head, co_list) {
             if (--next_num) {
@@ -250,7 +248,7 @@ void co_yield() {
         co_current = co_pos;
 
         if (co_pos->status == CO_NEW) {
-            stack_switch_call(co_pos->stack, co_pos->func, co_pos->arg);
+            stack_switch_call(co_pos->stack, co_pos->func, (uintptr_t)co_pos->arg);
         }
         longjmp(co_pos->context, 1);
     } else {
