@@ -246,7 +246,7 @@ void co_yield() {
     if (val == 0) {
         // 选择下一个待运行的协程 (相当于修改 current), 并切换到这个协程运行
         srand(time(NULL));
-        next_num = rand() % co_list_num + 1;
+        next_num = (rand() % co_list_num) + 1;
 
         list_for_each_entry(co_pos, co_list_head, co_list) {
             if (!(--next_num)) {
