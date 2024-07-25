@@ -212,7 +212,7 @@ void co_init (void)  {
 }
 
 // 这里的对齐很关键, 这里的对齐会将协程的 rsp 栈顶指针进行对齐, 对齐之后后续执行才不会出错误
-__attribute__((force_align_arg_pointer))
+// __attribute__((force_align_arg_pointer))
 void co_warpper (struct co *co) {
     co->func(co->arg);
     co->status = CO_DEAD;
@@ -247,6 +247,9 @@ void co_wait(struct co *co) {
     while (co->status != CO_DEAD) {   
         co_yield();
     }
+
+    list_del(&co->co_list);
+    free(co);
 }
 
 static inline void
