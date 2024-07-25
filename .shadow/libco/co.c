@@ -31,6 +31,22 @@
 #define STACK_SIZE  (64 * 1024)
 
 /**
+ * 双向链表数据结构
+ */
+struct list_head {
+	struct list_head *next, *prev;
+};
+
+#define LIST_HEAD_INIT(name) { &(name), &(name) }
+
+#define LIST_HEAD(name) \
+	struct list_head name = LIST_HEAD_INIT(name)
+
+#define INIT_LIST_HEAD(ptr) do { \
+	(ptr)->next = (ptr); (ptr)->prev = (ptr); \
+} while (0)
+
+/**
  * 协程数据结构定义
  */
 typedef enum co_status {
@@ -75,22 +91,6 @@ stack_switch_call(void *sp, void *entry, uintptr_t arg);
 struct co         *co_current;
 struct list_head  *co_list_head = NULL;
 int                co_list_num  = 0;
-
-/**
- * 双向链表数据结构
- */
-struct list_head {
-	struct list_head *next, *prev;
-};
-
-#define LIST_HEAD_INIT(name) { &(name), &(name) }
-
-#define LIST_HEAD(name) \
-	struct list_head name = LIST_HEAD_INIT(name)
-
-#define INIT_LIST_HEAD(ptr) do { \
-	(ptr)->next = (ptr); (ptr)->prev = (ptr); \
-} while (0)
 
 /*
  * Insert a new entry between two known consecutive entries.
