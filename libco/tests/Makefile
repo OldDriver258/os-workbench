@@ -1,6 +1,9 @@
-.PHONY: test libco
+.PHONY: test libco debug
 
 all: libco-test-64 libco-test-32
+
+debug: libco all
+	@LD_LIBRARY_PATH=.. gdb -tui ./libco-test-64
 
 test: libco all
 	@echo "==== TEST 64 bit ===="
