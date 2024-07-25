@@ -245,8 +245,8 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
 }
 
 void co_wait(struct co *co) {
-    current->status = CO_WAITING;
-    current->wait   = co;
+    co_current->status = CO_WAITING;
+    co_current->wait   = co;
 
     while (co->status != CO_DEAD) {   
         co_yield();
@@ -255,7 +255,7 @@ void co_wait(struct co *co) {
     list_del(&co->co_list);
     free(co);
 
-    current->status = CO_RUNNING;
+    co_current->status = CO_RUNNING;
 }
 
 static inline void
