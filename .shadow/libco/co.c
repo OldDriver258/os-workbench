@@ -216,10 +216,13 @@ __attribute__((force_align_arg_pointer))
 void co_warpper (struct co *co) {
     co->func(co->arg);
     co->status = CO_DEAD;
-    longjmp(co_current->wait->context, 1);
-    // while (1) {
-    //     co_yield();
-    // }
+    if (co_current->wait) {
+        longjmp(co_current->wait->context, 1);
+    } else {
+        while (1) {
+            co_yield();
+        }
+    } 
 }
 
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
