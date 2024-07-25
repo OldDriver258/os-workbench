@@ -1,3 +1,13 @@
+/*
+ * @Author: ZhangYuchen 1430024269@qq.com
+ * @Date: 2024-07-25 13:10:54
+ * @LastEditors: ZhangYuchen 1430024269@qq.com
+ * @LastEditTime: 2024-07-25 13:34:10
+ * @FilePath: /os-workbench/libco/co.c
+ * @Description: 在这个实验中，我们实现轻量级的用户态携谐协程 (coroutine，“协同程序”)，
+ *               也称为 green threads、user-level threads，可以在一个不支持线程的
+ *               操作系统上实现共享内存多任务并发。
+ */
 #include "co.h"
 #include <stdlib.h>
 #include <stdint.h>
@@ -5,28 +15,24 @@
 #include <malloc.h>
 #include <time.h>
 
-#undef LOCAL_MACHINE
+/**
+ * 调试信息输出开关
+ */
+// #define LOCAL_MACHINE
 #ifdef LOCAL_MACHINE
     #define debug(...) printf(__VA_ARGS__)
 #else
     #define debug(...)
 #endif
 
+/**
+ * 宏定义
+ */
 #define STACK_SIZE  (64 * 1024)
 
-struct list_head {
-	struct list_head *next, *prev;
-};
-
-#define LIST_HEAD_INIT(name) { &(name), &(name) }
-
-#define LIST_HEAD(name) \
-	struct list_head name = LIST_HEAD_INIT(name)
-
-#define INIT_LIST_HEAD(ptr) do { \
-	(ptr)->next = (ptr); (ptr)->prev = (ptr); \
-} while (0)
-
+/**
+ * 协程数据结构定义
+ */
 typedef enum co_status {
     CO_NEW = 1, // 创建未执行
     CO_RUNNING, // 已经执行过
@@ -60,9 +66,31 @@ struct co {
     uint8_t         stack[STACK_SIZE];  // 协程的堆栈
 };
 
+/**
+ * 函数申明
+ */
+static inline void
+stack_switch_call(void *sp, void *entry, uintptr_t arg);
+
 struct co         *co_current;
 struct list_head  *co_list_head = NULL;
 int                co_list_num  = 0;
+
+/**
+ * 双向链表数据结构
+ */
+struct list_head {
+	struct list_head *next, *prev;
+};
+
+#define LIST_HEAD_INIT(name) { &(name), &(name) }
+
+#define LIST_HEAD(name) \
+	struct list_head name = LIST_HEAD_INIT(name)
+
+#define INIT_LIST_HEAD(ptr) do { \
+	(ptr)->next = (ptr); (ptr)->prev = (ptr); \
+} while (0)
 
 /*
  * Insert a new entry between two known consecutive entries.
@@ -191,6 +219,10 @@ static inline void list_del(struct list_head *entry)
 	     &pos->member != (head); 					\
 	     pos = n, n = list_entry(n->member.next, typeof(*n), member))
 
+/**
+ * @description: 协程初始化, 在 main 函数执行前执行
+ * @return {*}
+ */
 __attribute__((constructor)) 
 void co_init (void)  {
     struct co *co_main = (struct co *)malloc(sizeof(struct co));
@@ -211,6 +243,11 @@ void co_init (void)  {
     srand(time(NULL));
 }
 
+/**
+ * @description: 子协程的包装函数
+ * @param {co} *co 子协程结构体
+ * @return {*}
+ */
 // 这里的对齐很关键, 这里的对齐会将协程的 rsp 栈顶指针进行对齐, 64 位对齐之后后续执行才不会出错误
 __attribute__((force_align_arg_pointer))
 void co_warpper (struct co *co) {
@@ -226,13 +263,19 @@ void co_warpper (struct co *co) {
     }
 }
 
+/**
+ * @description: 创建一个新的协程运行
+ * @param {char} *name 协程名称
+ * @param {void} * 协程函数入口
+ * @param {void} *arg 协程函数参数
+ * @return {*} 创建的新的协程结构体
+ */
 struct co *co_start(const char *name, void (*func)(void *), void *arg) {
     struct co *new = (struct co *)malloc(sizeof(struct co));
 
-    new->name = name;
-    new->func = func;
-    new->arg  = arg;
-
+    new->name   = name;
+    new->func   = func;
+    new->arg    = arg;
     new->status = CO_NEW;
     new->wait   = NULL;
 
@@ -248,7 +291,27 @@ struct co *co_start(const char *name, void (*func)(void *), void *arg) {
     return new;
 }
 
+/**
+ * @description: 等待协程运行完成
+ * @param {co} *co 等待的协程结构体
+ * @return {*}
+ */
 void co_wait(struct co *co) {
+    struct co *co_pos;
+    int        co_exist = 0;
+
+    // 首先检查一下 co 是否合法
+    list_for_each_entry(co_pos, co_list_head, co_list) {
+        if (co_pos == co) {
+            co_exist = 1;
+        }
+    }
+
+    if (!co_exist) {
+        return;
+    }
+
+    // 再对 co 进行等待
     co_current->status = CO_WAITING;
     co_current->wait   = co;
 
@@ -262,9 +325,10 @@ void co_wait(struct co *co) {
     co_current->status = CO_RUNNING;
 }
 
-static inline void
-stack_switch_call(void *sp, void *entry, uintptr_t arg);
-
+/**
+ * @description: 让出 CPU 协程切换, 找到下一个要运行的协程, 实现协程的调度
+ * @return {*}
+ */
 void co_yield() {
     int next_num;
     int val = setjmp(co_current->context);
@@ -295,6 +359,13 @@ void co_yield() {
     }
 }
 
+/**
+ * @description: 协程开始运行的时候, 切换到开始运行的堆栈, 运行到函数入口处
+ * @param {void} *sp 指定栈顶指针 rsp 的地址
+ * @param {void} *entry 指定协程运行的入口
+ * @param {uintptr_t} arg 指定协程运行的参数
+ * @return {*}
+ */
 static inline void
 stack_switch_call(void *sp, void *entry, uintptr_t arg) {
     __asm__ volatile (
